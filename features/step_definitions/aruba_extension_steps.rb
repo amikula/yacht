@@ -8,3 +8,9 @@ end
 Then /^the file "([^"]*)" should contain:$/ do |file, exact_content|
   check_exact_file_content(file, exact_content)
 end
+
+Then "the output should contain these messages:" do |messages|
+  messages.raw.flatten.each do |message|
+    all_output.should include(message)
+  end
+end
