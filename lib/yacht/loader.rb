@@ -1,3 +1,5 @@
+require 'yacht/base'
+
 class Yacht::Loader
   class << self
     def environment
