@@ -22,9 +22,14 @@ class Yacht
     end
 
     def run
-      @config = Yacht::Loader.base_config
+      config = Yacht::Loader.base_config
 
-      keys_not_overridden = find_keys_not_overridden(@config)
+      report_keys_not_overridden(config)
+      report_popular_values(config)
+    end
+
+    def report_keys_not_overridden(config)
+      keys_not_overridden = find_keys_not_overridden(config)
       keys_not_overridden.sort!
 
       unless keys_not_overridden.empty?
@@ -33,6 +38,27 @@ class Yacht
         puts "The following #{keys_string} in the default environment #{is_are} never overridden, consider using a constant:"
         keys_not_overridden.each do |key|
           puts "    #{key}"
+        end
+      end
+    end
+
+    def report_popular_values(config)
+      config = config.dup
+      config.delete('default')
+      num_environments = config.length
+
+      report = report_override_values(config)
+
+      report.each_pair do |key,value_report|
+        next if key == '_parent'
+
+        total_overrides = value_report.values.inject(0){|sum,v| sum+v}
+
+        defaulted_environments_count = num_environments - total_overrides
+
+        max_override_count = value_report.values.sort.last
+        if max_override_count > defaulted_environments_count
+          puts "The value for \"#{key}\" is often overridden to \"#{value_report.invert[max_override_count]}\", consider changing the default"
         end
       end
     end

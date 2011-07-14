@@ -42,26 +42,26 @@ Feature: Barnacle tool
     Given a file named "yacht/base.yml" with:
     """
     default:
-      redundant: no
+      redundant: "no"
       nested:
-        redundant: yes
+        redundant: "yes"
     development:
-      redundant: yes
+      redundant: "yes"
       nested:
-        redundant: yes
+        redundant: "yes"
     test:
-      redundant: yes
+      redundant: "yes"
       nested:
-        redundant: no
+        redundant: "no"
     production:
-      redundant: maybe
+      redundant: "maybe"
       nested:
-        redundant: no
+        redundant: "no"
     """
     When I run `rake barnacle`
     Then the output should contain these messages:
-      | The value for "redundant" in the default environment is often overridden to "yes", consider changing the default       |
-      | The value for "nested.redundant" in the default environment is often overridden to "no", consider changing the default |
+      | The value for "redundant" is often overridden to "yes", consider changing the default       |
+      | The value for "nested.redundant" is often overridden to "no", consider changing the default |
 
   @announce
   Scenario: Any configuration values overridden with the same value they already had
