@@ -26,7 +26,7 @@ class Yacht
 
       keys_not_overridden = find_keys_not_overridden(@config)
       keys_not_overridden.sort!
-      
+
       unless keys_not_overridden.empty?
         keys_string, is_are = keys_not_overridden.length == 1 ? ["key", "is"] : ["keys", "are"]
 
@@ -64,6 +64,24 @@ class Yacht
       end
 
       default_keys
+    end
+
+    def report_override_values(hash)
+      hash = hash.dup
+      hash.delete('default')
+
+      retval = Hash.new{|h,k| h[k] = Hash.new(0) }
+
+      # TODO: Unhappy path: what if one or more of the values is not a Hash?
+      hash.values.each do |env_config|
+        flattened = flatten_keys(env_config)
+
+        flattened.each_pair do |k,v|
+          retval[k][v] += 1
+        end
+      end
+
+      retval
     end
   end
 end
