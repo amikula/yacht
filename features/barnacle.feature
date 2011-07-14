@@ -30,9 +30,12 @@ Feature: Barnacle tool
         yet_another_config: value2
     """
     When I run `rake barnacle`
-    Then the output should contain these messages:
-      | The value "top_level_never_overridden" in the default environment is never overridden, consider using a constant    |
-      | The value "second_level.never_overridden" in the default environment is never overridden, consider using a constant |
+    Then the output should contain:
+    """
+    The following keys in the default environment are never overridden, consider using a constant:
+        second_level.never_overridden
+        top_level_never_overridden
+    """
 
   @announce
   Scenario: More than half of the environments override the default with the same value
@@ -57,8 +60,8 @@ Feature: Barnacle tool
     """
     When I run `rake barnacle`
     Then the output should contain these messages:
-      | The value "redundant" in the default environment is often overridden to "yes", consider changing the default       |
-      | The value "nested.redundant" in the default environment is often overridden to "no", consider changing the default |
+      | The value for "redundant" in the default environment is often overridden to "yes", consider changing the default       |
+      | The value for "nested.redundant" in the default environment is often overridden to "no", consider changing the default |
 
   @announce
   Scenario: Any configuration values overridden with the same value they already had

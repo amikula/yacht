@@ -24,8 +24,16 @@ class Yacht
     def run
       @config = Yacht::Loader.base_config
 
-      find_keys_not_overridden(@config).each do |key|
-        puts "The value \"#{key}\" in the default environment is never overridden, consider using a constant"
+      keys_not_overridden = find_keys_not_overridden(@config)
+      keys_not_overridden.sort!
+      
+      unless keys_not_overridden.empty?
+        keys_string, is_are = keys_not_overridden.length == 1 ? ["key", "is"] : ["keys", "are"]
+
+        puts "The following #{keys_string} in the default environment #{is_are} never overridden, consider using a constant:"
+        keys_not_overridden.each do |key|
+          puts "    #{key}"
+        end
       end
     end
 
