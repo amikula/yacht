@@ -1,4 +1,5 @@
 require 'yacht/loader'
+require 'yacht/barnacle/event_collector'
 
 class Yacht
   class Barnacle
@@ -26,6 +27,7 @@ class Yacht
 
       report_keys_not_overridden(config)
       report_popular_values(config)
+      report_duplicate_values(config)
     end
 
     def report_keys_not_overridden(config)
@@ -108,6 +110,31 @@ class Yacht
       end
 
       retval
+    end
+
+    def report_duplicate_values(hash)
+      collector = Yacht::Barnacle::EventCollector.new
+
+      # TODO: Unhappy path: what if one or more of the values is not a Hash?
+      hash.keys.each do |env|
+        next if env == 'default'
+
+        # Empty the environments chain.
+        # TODO: Find a way to do this inside of chain_configs
+        collector.environments.delete_if{true}
+
+        Yacht::Loader.send(:chain_configs, hash, env, collector)
+      end
+
+      collector.duplicates.keys.each do |k|
+        k = k.dup
+
+        config = k.pop
+        child_environment = k.pop
+        parent_environment = k.pop
+
+        puts "The value for \"#{config}\" in the #{parent_environment} environment is overridden to the same value in child environment #{child_environment}, consider removing it from the child environment"
+      end
     end
   end
 end

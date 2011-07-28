@@ -87,19 +87,25 @@ class Yacht::Loader
       end
     end
 
-    def chain_configs(config, env)
-      if config.has_key?(env)
-        parent = if parent_env = config[env]['_parent']
-                   raise Yacht::LoadError.new "environment '#{parent_env}' does not exist" unless config.has_key?(parent_env)
-                   chain_configs(config, config[env]['_parent'])
-                 else
-                   config['default'] || {}
-                 end
+    def chain_configs(config, env, collector=nil)
+      retval = if config.has_key?(env)
+                 parent = if parent_env = config[env]['_parent']
+                            raise Yacht::LoadError.new "environment '#{parent_env}' does not exist" unless config.has_key?(parent_env)
+                            chain_configs(config, config[env]['_parent'], collector)
+                          else
+                            collector.environments.push('default') if collector
 
-        Yacht::HashHelper.deep_merge(parent, config[env])
-      else
-        config['default'] || {}
-      end
+                            config['default'] || {}
+                          end
+
+                 collector.environments.push(env) if collector
+
+                 Yacht::HashHelper.deep_merge(parent, config[env], collector)
+               else
+                 config['default'] || {}
+               end
+
+      retval
     end
   end
 end

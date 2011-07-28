@@ -8,13 +8,13 @@ Bundler.setup
 require 'yacht'
 
 RSpec.configure do |config|
-  config.before :all do
-    # ==============
-    # = SimpleCov! =
-    # ==============
-    require 'simplecov'
-    SimpleCov.start
-  end
+  # config.before :all do
+  #   # ==============
+  #   # = SimpleCov! =
+  #   # ==============
+  #   require 'simplecov'
+  #   SimpleCov.start
+  # end
 
   config.after :each do
     Yacht::Loader.environment = nil
